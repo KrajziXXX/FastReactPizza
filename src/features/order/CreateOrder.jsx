@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { Form, redirect, useActionData, useNavigation } from 'react-router-dom';
-import { createOrder } from '../../services/apiRestaurant';
-import Button from '../../ui/Button';
-import EmptyCart from '../cart/EmptyCart';
-import { useDispatch, useSelector } from 'react-redux';
-import { clearCart, getCart, getTotalCartPrice } from '../cart/cartSlice';
-import store from '../../store';
-import { formatCurrency } from '../../utils/helpers';
-import { fetchAddress } from '../user/userSlice';
+import { useState } from "react";
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
+import { createOrder } from "../../services/apiRestaurant";
+import Button from "../../ui/Button";
+import EmptyCart from "../cart/EmptyCart";
+import { useDispatch, useSelector } from "react-redux";
+import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
+import store from "../../store";
+import { formatCurrency } from "../../utils/helpers";
+import { fetchAddress } from "../user/userSlice";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -24,10 +24,10 @@ function CreateOrder() {
     address,
     error: errorAddress,
   } = useSelector((state) => state.user);
-  const isLoadingAddress = addressStatus === 'loading';
+  const isLoadingAddress = addressStatus === "loading";
 
   const navigation = useNavigation();
-  const isSubmitting = navigation.state === 'submitting';
+  const isSubmitting = navigation.state === "submitting";
 
   const formErrors = useActionData();
   const dispatch = useDispatch();
@@ -43,7 +43,6 @@ function CreateOrder() {
     <div className="px-4 py-6">
       <h2 className="mb-8 text-xl font-semibold">Ready to order? Let's go!</h2>
 
-      {/* <Form method="POST" action="/order/new"> */}
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
           <label className="sm:basis-40">First Name</label>
@@ -79,7 +78,7 @@ function CreateOrder() {
               defaultValue={address}
               required
             />
-            {addressStatus === 'error' && (
+            {addressStatus === "error" && (
               <p className="mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700">
                 {errorAddress}
               </p>
@@ -124,13 +123,13 @@ function CreateOrder() {
             value={
               position.longitude && position.latitude
                 ? `${position.latitude},${position.longitude}`
-                : ''
+                : ""
             }
           />
 
           <Button disabled={isSubmitting || isLoadingAddress} type="primary">
             {isSubmitting
-              ? 'Placing order....'
+              ? "Placing order...."
               : `Order now from ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
@@ -146,7 +145,7 @@ export async function action({ request }) {
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
-    priority: data.priority === 'true',
+    priority: data.priority === "true",
   };
 
   console.log(order);
@@ -154,14 +153,11 @@ export async function action({ request }) {
   const errors = {};
   if (!isValidPhone(order.phone))
     errors.phone =
-      'Please give us your correct phone number. We might need it to contact you.';
+      "Please give us your correct phone number. We might need it to contact you.";
 
   if (Object.keys(errors).length > 0) return errors;
-
-  // If everything is okay, create new order and redirect
   const newOrder = await createOrder(order);
 
-  // Do NOT overuse
   store.dispatch(clearCart());
 
   return redirect(`/order/${newOrder.id}`);
